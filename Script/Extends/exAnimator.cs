@@ -21,42 +21,50 @@ namespace YLibrary
             animator.Play(animation_name);
         }
 
-        public static void CallAnimationStart(this Animator animator, UnityAction callback)
+        public static void OnAnimationStart(this Animator animator, UnityAction<AnimatorStateInfo> callback)
         {
 
-            YCoroutin.instance.RunCoroutin(
-                CoroutinCallAnimationStart(animator, callback));
-
-        }
-        private static IEnumerator CoroutinCallAnimationStart(Animator animator, UnityAction callback)
-        {
-
-            while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime <= -1f)
+            IEnumerator Coroutin()
             {
 
-                Debug.Log(animator.GetCurrentAnimatorStateInfo(0).normalizedTime);
-                yield return null;
+                AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
+
+                while (
+                    ((info = animator.GetCurrentAnimatorStateInfo(0)).normalizedTime % 1) < 0.1f)
+                {
+
+                    yield return null;
+
+                }
+
+                callback(info);
 
             }
 
-            callback();
+            YCoroutin.instance.StartCoroutine(Coroutin());
 
         }
-
-        public static void CallAnimationEnd(this Animator animator, UnityAction callback)
+        public static void OnAnimationEnd(this Animator animator, UnityAction<AnimatorStateInfo> callback)
         {
 
-            YCoroutin.instance.RunCoroutin(
-                CoroutinCallAnimationEnd(animator, callback));
+            IEnumerator Coroutin()
+            {
 
-        }
-        private static IEnumerator CoroutinCallAnimationEnd(Animator animator, UnityAction callback)
-        {
+                AnimatorStateInfo info = animator.GetCurrentAnimatorStateInfo(0);
 
-            while (animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f)
-                yield return null;
+                while (
+                    ((info = animator.GetCurrentAnimatorStateInfo(0)).normalizedTime % 1) < 0.9f)
+                {
 
-            callback();
+                    yield return null;
+
+                }
+
+                callback(info);
+
+            }
+
+            YCoroutin.instance.StartCoroutine(Coroutin());
 
         }
 

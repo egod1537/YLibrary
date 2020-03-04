@@ -34,6 +34,7 @@ namespace YLibrary
                 return _instance;
 
             }
+            set { _instance = value; }
 
         }
 

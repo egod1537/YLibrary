@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.Events;
 using System;
+using UnityEngine.UI;
 
 namespace YLibrary
 {
@@ -11,51 +12,104 @@ namespace YLibrary
     public class YAnimation : MonoBehaviour
     {
 
-        public class Animation : UnityEvent { }
-        public class AnimationStart : UnityEvent { }
-        public class AnimationEnd : UnityEvent { }
-
-        private Dictionary<string, Animation> Animations;
-        private Dictionary<string, AnimationStart> OnAnimationStart;
-        private Dictionary<string, AnimationEnd> OnAnimationEnd;
-
-        public virtual void Awake()
+        public UnityAction OnAnimationStart = () => { };
+        public UnityAction OnAnimationEnd = () => { };   
+        
+        [Serializable]
+        public struct KeyFrame
         {
 
-            Animations = new Dictionary<string, Animation>();
-            OnAnimationEnd = new Dictionary<string, AnimationEnd>();
+            public float delay, duration;
+
+            public Vector3 Position, Rotation, Scale;
+
+            public Ease Ease;
+
+            public Color Color;
 
         }
 
-        private void OnDestroy()
+        [Flags]
+        public enum AnimationType
         {
 
-            Animations.Clear();
+            CALL = 1 << 0,
+            AWAKE = 1 << 1,
+            START = 1 << 2,
+            COUNT = 3
 
         }
 
-        public void AddAnimation(string animation_name, UnityAction animation) {
+        public AnimationType Type;
 
-            if (!Animations.ContainsKey(animation_name))
-                Animations.Add(animation_name, new Animation());
+        public int size;
+        public KeyFrame[] KeyFrames;
 
-            Animations[animation_name].AddListener(animation);
+        Sequence seq;
+
+        Image trImage;
+
+        private void Awake()
+        {
+
+            seq = DOTween.Sequence();
+
+            seq.SetAutoKill(false);
+
+            trImage = GetComponent<Image>();
+
+            float time = 0f;
+
+            for(int i=0; i < size; i++)
+            {
+
+                KeyFrame frame = KeyFrames[i];
+
+                time += frame.delay;
+
+                seq.Insert(time,
+                    transform.DOLocalMove(frame.Position, frame.duration)
+                    .SetEase(frame.Ease));
+
+                seq.Insert(time,
+                    transform.DOLocalRotate(frame.Rotation, frame.duration)
+                    .SetEase(frame.Ease));
+
+                seq.Insert(time,
+                    transform.DOScale(frame.Scale, frame.duration)
+                    .SetEase(frame.Ease));
+
+                if (trImage != null)
+                    seq.Insert(time,
+                        trImage.DOColor(frame.Color, frame.duration)
+                        .SetEase(frame.Ease));
+
+                time += frame.duration;
+
+            }
 
         }
 
-        public void AddAnimationEndCallback(string animation_name, UnityAction callback)
+        public void FowardPlay()
         {
-            OnAnimationEnd[animation_name].AddListener(callback);
+
+            OnAnimationStart();
+
+            seq.OnComplete(
+                () => { OnAnimationEnd(); });
+
+            seq.Restart();
+
         }
 
-        public void InvokeAnimationEndCallback(string animation_name) => OnAnimationEnd[animation_name].Invoke();
-
-        public void PlayAnimation(string animation_name)
+        public void BackwardPlay()
         {
 
-            if (!Animations.ContainsKey(animation_name)) return;
+            OnAnimationStart();
 
-            Animations[animation_name].Invoke();
+            seq.OnRewind(() => { OnAnimationEnd(); });
+
+            seq.PlayBackwards();
 
         }
 

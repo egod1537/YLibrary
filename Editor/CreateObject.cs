@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-namespace YLibraryEditor
+namespace YEditor
 {
 
     public class CreateObject

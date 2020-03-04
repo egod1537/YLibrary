@@ -8,6 +8,19 @@ namespace YLibrary
     public static class exGameObject
     {
 
+        public static Transform ResetTransform(this GameObject gameobject)
+        {
+
+            gameobject.transform.localPosition = Vector3.zero;
+            gameobject.transform.localEulerAngles = Vector3.zero;
+            gameobject.transform.localScale = Vector3.one;
+
+            return gameobject.transform;
+
+        }
+
+        #region SetTransform
+
         public static Vector3 SetPosX(this GameObject gameobject, float value)
         {
 
@@ -227,6 +240,65 @@ namespace YLibrary
             return value;
 
         }
+
+        #endregion
+        #region AddTransform
+
+        public static Vector3 AddRotX(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetRotX(gameobject.transform.eulerAngles.x + value);
+        }
+        public static Vector3 AddRotY(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetRotY(gameobject.transform.eulerAngles.y + value);
+        }
+        public static Vector3 AddRotZ(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetRotZ(gameobject.transform.eulerAngles.z + value);
+        }
+        public static Vector3 AddRot(this GameObject gameobject, Vector3 value)
+        {
+            return gameobject.transform.SetRot(gameobject.transform.eulerAngles + value);
+        }
+
+        public static Vector3 AddLocalRotX(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalRotX(gameobject.transform.localEulerAngles.x + value);
+        }
+        public static Vector3 AddLocalRotY(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalRotY(gameobject.transform.localEulerAngles.y + value);
+        }
+        public static Vector3 AddLocalRotZ(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalRotZ(gameobject.transform.localEulerAngles.z + value);
+        }
+        public static Vector3 AddLocalRot(this GameObject gameobject, Vector3 value)
+        {
+            return gameobject.transform.SetLocalRot(gameobject.transform.localEulerAngles + value);
+        }
+
+        public static Vector3 AddLocalScaleX(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalScaleX(gameobject.transform.localScale.x + value);
+        }
+        public static Vector3 AddLocalScaleY(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalScaleY(gameobject.transform.localScale.y + value);
+        }
+        public static Vector3 AddLocalScaleZ(this GameObject gameobject, float value)
+        {
+            return gameobject.transform.SetLocalScaleZ(gameobject.transform.localScale.z + value);
+        }
+        public static Vector3 AddLocalScale(this GameObject gameobject, Vector3 value)
+        {
+            return gameobject.transform.SetLocalScale(gameobject.transform.localScale + value);
+        }
+
+        #endregion
+
+        public static void InPool(this GameObject gameobject, string name) => YObjectPool.InPool(name, gameobject);
+        public static void InPool(this GameObject gameobject) => YObjectPool.InPool(gameobject.name, gameobject);
 
     }
 

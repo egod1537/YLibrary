@@ -12,6 +12,13 @@ namespace YLibrary
 
         public delegate IEnumerator Method();
 
+        private void Awake()
+        {
+
+            instance = this;
+
+        }
+
         public void DelayMethod(float delay, UnityAction callback)
         {
 
